@@ -1,0 +1,49 @@
+/* Dedicated to the public domain by Sam Hocevar under CC0
+ * See https://github.com/LeoColomb/perfectmotherfuckingwebsite/blob/main/fuckingstyle.scss
+ * Modifications are copyright Jynn Nelson under MIT license */
+
+/* TODO: auto-reload these files when they change
+ * That requires making this a flower page, which is currently broken;
+ * see https://codeberg.org/jyn514/flower/issues/73
+ */
+@import 'material-pygments.css' (prefers-color-scheme: dark);
+@import 'pygments-light.css' (prefers-color-scheme: light);
+
+body {
+  max-width: 650px;
+  margin: auto;
+  margin-top: 40px;
+  padding: 0 10px;
+  font: 18px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  color: #444;
+}
+pre, code {
+  overflow-x: auto;
+}
+h1, h2, h3 {
+  line-height: 1.2;
+}
+a.flower-anchor::before {
+  margin-left: .2em;
+  content: "¶";
+}
+a:not(hover).flower-anchor {
+  opacity: .18;
+  text-decoration: none;
+}
+/* TODO: code blocks are not indicated in light mode :/ */
+@media (prefers-color-scheme: dark) {
+  body {
+    color: #c9d1d9;
+    background: #0d1117;
+  }
+  pre, code {
+    background-color: black;
+  }
+  a:link {
+    color: #58a6ff;
+  }
+  a:visited {
+    color: #8e96f0;
+  }
+}

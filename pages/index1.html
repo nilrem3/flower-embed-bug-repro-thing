@@ -1,0 +1,22 @@
+---
+template: null
+---
+<!DOCTYPE html>
+◊(require '[expressions.meta :refer [embed]])
+<html>
+  <head>
+    <title>bug reproduction</title>
+  </head>
+  <body>
+        ◊; Box 2 and 3 receive Box 1's contents
+        ◊(embed "box.html")«
+            Box Contents 1
+        »
+        ◊(embed "box.html" {'title "Box 2"})«
+            Box Contents 2
+        »
+        ◊(embed "box.html" {'title "Box 3"})«
+            Box Contents 3
+        »
+  </body>
+</html>

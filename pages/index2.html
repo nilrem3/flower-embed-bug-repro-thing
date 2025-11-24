@@ -1,0 +1,16 @@
+---
+template: null
+---
+<!DOCTYPE html>
+◊(require '[expressions.meta :refer [embed]])
+<html>
+  <head>
+    <title>bug reproduction</title>
+  </head>
+  <body>
+        ◊; Box does not get any content
+        ◊(embed "box.html" {'title "Box"})«
+            Box Contents 1
+        »
+  </body>
+</html>

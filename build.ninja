@@ -1,0 +1,83 @@
+transformers = transformers/preprocess.clj$ transformers/markdown.clj$ transformers/embed.clj$ transformers/highlight.clj$ transformers/md_html_links.clj$ transformers/redirect.clj$ transformers/toc.clj$ transformers/content.clj
+transform-map = '{}'
+all-frontmatter = .build/all-frontmatter.json
+builddir = .build
+
+build build.clj: phony ./.build/defaults/build.clj
+build sass/minima/_syntax-highlighting.scss: phony ./.build/defaults/sass/minima/_syntax-highlighting.scss
+build expressions/pages.clj: phony ./.build/defaults/expressions/pages.clj
+build transformers/standalone/generate_redirect.clj: phony ./.build/defaults/transformers/standalone/generate_redirect.clj
+build transformers/redirect.clj: phony ./.build/defaults/transformers/redirect.clj
+build expressions/transform_sorter.clj: phony ./.build/defaults/expressions/transform_sorter.clj
+build transformers/toc.clj: phony ./.build/defaults/transformers/toc.clj
+build expressions/example.clj: phony ./.build/defaults/expressions/example.clj
+build expressions/ninja.clj: phony ./.build/defaults/expressions/ninja.clj
+build transformers/md_html_links.clj: phony ./.build/defaults/transformers/md_html_links.clj
+build sass/minima: phony ./.build/defaults/sass/minima
+build expressions/meta.clj: phony ./.build/defaults/expressions/meta.clj
+build sass: phony ./.build/defaults/sass
+build expressions/default_build.clj: phony ./.build/defaults/expressions/default_build.clj
+build expressions/utils.clj: phony ./.build/defaults/expressions/utils.clj
+build sass/minima/_base.scss: phony ./.build/defaults/sass/minima/_base.scss
+build expressions/shortcodes.clj: phony ./.build/defaults/expressions/shortcodes.clj
+build sass/minima.scss: phony ./.build/defaults/sass/minima.scss
+build transformers/highlight.clj: phony ./.build/defaults/transformers/highlight.clj
+build expressions/html.clj: phony ./.build/defaults/expressions/html.clj
+build transformers/standalone/split_sass_dependencies.clj: phony ./.build/defaults/transformers/standalone/split_sass_dependencies.clj
+build transformers/preprocess.clj: phony ./.build/defaults/transformers/preprocess.clj
+build .gitignore: phony ./.build/defaults/.gitignore
+build expressions/title.clj: phony ./.build/defaults/expressions/title.clj
+build transformers/markdown.clj: phony ./.build/defaults/transformers/markdown.clj
+build transformers/content.clj: phony ./.build/defaults/transformers/content.clj
+build transformers/embed.clj: phony ./.build/defaults/transformers/embed.clj
+build sass/minima/_layout.scss: phony ./.build/defaults/sass/minima/_layout.scss
+build transformers: phony ./.build/defaults/transformers
+build transformers/standalone: phony ./.build/defaults/transformers/standalone
+build expressions: phony ./.build/defaults/expressions
+
+rule transform
+  command = /home/mia/bin/flower transform < $in --depfile $in.d --out-file $out --transform-map $transform-map --all-frontmatter $all-frontmatter --raw-output $transformers > $out
+  description = run all transformers on $page
+rule redirect
+  command = echo $target | /home/mia/bin/flower transform --standalone --raw-input --raw-output --depfile $depfile --out-file $out transformers/standalone/generate_redirect.clj >  $out
+rule join-frontmatter
+  command = /home/mia/bin/flower join-frontmatter $out $in
+  restat = true
+  description = join all page frontmatter into a cache
+rule ninja-meta
+  restat = true
+  command = /home/mia/bin/flower configure $settings
+  description = rebuild build.ninja itself
+rule mkdir
+  command = mkdir -p .build
+  description = create build dir
+rule link
+  command = ln -f $in $out
+  description = link $in into build dir
+rule frontmatter
+  command = /home/mia/bin/flower split-frontmatter --filename $in < $in > $out
+rule sass
+  command = sass --quiet $in $out; /home/mia/bin/flower transform transformers/standalone/split_sass_dependencies.clj --standalone --raw-output --source-file=$out <$source-map >$depfile
+  description = compile Sass file $in to CSS
+
+build .build/index.html.json: frontmatter pages/index.html | /home/mia/bin/flower
+build public/index.html: transform .build/index.html.json | transformers/redirect.clj transformers/highlight.clj transformers/content.clj transformers/toc.clj transformers/markdown.clj transformers/md_html_links.clj transformers/preprocess.clj transformers/embed.clj public/minima.css .build/all-frontmatter.json
+  page = pages/index.html
+  tmpfile = '.build/index.html.transformed.json'
+  depfile = .build/index.html.json.d
+build public/favicon.jpg: link static/favicon.jpg
+build public/material-pygments.css: link static/material-pygments.css
+build public/main.css: link static/main.css
+build public/pygments-light.css: link static/pygments-light.css
+build public/style.css: link static/style.css
+build public/main.js: link static/main.js
+build public/minima.css: sass ./.build/defaults/sass/minima.scss
+  source-map = public/minima.css.map
+  depfile = .build/minima.scss.d
+build .build/all-frontmatter.json: join-frontmatter .build/index.html.json | /home/mia/bin/flower
+build build.ninja: ninja-meta flower.edn build.clj .build/all-frontmatter.json /home/mia/bin/flower sass
+  generator = true
+  depfile = .build/build.clj.d
+  settings = '--set' 'drafts=false'
+build .build: mkdir 
+

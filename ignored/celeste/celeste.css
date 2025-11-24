@@ -1,0 +1,14 @@
+.map_panel {
+  width: 100%;
+  display: flex;
+}
+
+.map_panel > p {
+  width: 100%;
+  padding: 10px;
+}
+
+.map_panel > div {
+  width: 100%;
+  padding: 10px;
+}
